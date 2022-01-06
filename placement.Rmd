@@ -1,0 +1,268 @@
+---
+title: "Uni Placement"
+author: "Tim R"
+date: "06/01/2022"
+output: html_document
+---
+
+$~$
+
+## Business Task
+
+#### In this analysis we are presentated with a data set for students at a university, which focuses on their work placement success and it is our goal to analyze this data and pick up trends in what might influence whether someone gets hired or not
+
+$~$
+
+## About this data set
+
+#### This is a sample data set I found on Kaggle which was originally introduced to an MBA business analytics class at Jain University India and is licensed in the CCO public domain. Itincludes data about, secondary and higher secondary school percentage and specialization. It also includes degree specialization, type and Work experience and salary offers to the placed students, Serial Number and gender
+
+$~$
+
+$~$
+
+# Step 1: Ask
+
+#### For the ask process we are going to collect as many questions as we can to understand what the stakeholders want to know.
+
+$~$
+
+### Key questions
+
+#### In this analysis we are tasked with finding answers to the follwoing questions
+
+* #### Which factor influnced a candidate getting placed?
+* #### Does percentage matter for one to get placed?
+* #### Which degree specialization is much demanded by corporate?
+
+$~$
+
+$~$
+
+# Step 2: Prepare & Process
+
+#### For this stage we are going to load up the needed packages and data set. and the partciular package I am going to use is the 'tidyverse' as in includes all the tools we will need for this analysis, namely
+ 
+* #### readr for loading up and reading the csv file which hoilds our dataset
+* #### ggplot2 for the visualisations we will need to show our findings
+
+$~$
+
+```{r echo=FALSE}
+
+install.packages("tidyverse", repos="http://cran.us.r-project.org")
+library(tidyverse)
+library(tidyverse)
+library(ggplot2)
+
+setwd("/Users/tatenda/Documents/R projects/uni placement")
+data<-read_csv("placement.csv")
+
+```
+$~$
+
+$~$
+
+# Step 3: Analyze
+
+$~$
+
+
+## Summrised data
+
+$~$
+
+#### To get a basic understanding of the data we use the view function, which is also useful to make sure our data was loaded correctly. Further functions like summary give more detailed information about our data, which saves us time as we dont need to manually calculate mathmetical equations to find basic numerical data concerning this data set
+
+$~$
+
+### Overal Summarised data
+```{r echo=FALSE}
+summary(data)
+nrow(data)
+sum(is.na(data))
+```
+
+$~$
+
+$~$
+
+#### I found that our data can be split into two groups from the 'status' column, the people who found employment 'Placed' and those who did not 'Not Placed' so I use the subset function to ceate two new data sets with employment status as the defining variable of where each student will go. This makes analysis easier as I can gather information on group by group basis and make comparisons.
+
+
+### Summary of students not employed
+```{r echo=FALSE}
+np<-subset(data,status=="Not Placed")
+summary(np)
+```
+
+$~$
+
+### Sumary of employed students  
+```{r echo=FALSE}
+p<-subset(data,status=="Placed")
+summary(p)
+
+```
+
+
+$~$
+
+$~$
+
+### Effects of degree specialisation on placement
+
+$~$
+
+#### One of the guiding questions is whether degree choice affects employments and we are going to figure that out using the analysis below 
+```{r}
+ggplot(data = data)+ geom_bar(mapping = aes(x=specialisation,fill=status))+ labs(title = "relationship between specialisation and employment status")
+```
+
+#### From the information provided by the diagram we can tell that the students who study marketing and finance have higher placement records compared to those who study marketing and HR, this is further proven by the mathmatical equation which I executed in the botton code to calculate the percentage of students from each specialisatiomn who were able to get employment.
+```{r}
+finance <- sum(data$specialisation == 'Mkt&Fin' & data$status == 'Placed')/ sum(data$specialisation == 'Mkt&Fin')
+```
+#### Finance= 79%
+
+```{r}
+hr <- sum(data$specialisation == 'Mkt&HR' & data$status == 'Placed')/ sum(data$specialisation == 'Mkt&HR')
+finance
+hr
+```
+
+#### HR= 56%
+
+$~$
+
+$~$
+
+### Effects of work experience on salary
+
+#### For this partoicular analysis I chose to investigate whether prior work experience had an effect on a candidates proposesd salary offer. To make the comparison more fair and unbiased i devided the studentys according to sopecialisation each represented by a diffrent line and work experince being represented by teh dots on the graph. 
+```{r}
+ggplot(data = data)+ geom_point(mapping = aes(x=degree_p,y=salary, colour=workex, size=1))+scale_color_manual(values = c("#1b98e0", "#353436","#F8766D" ,"#00BFC4", "#C77CFF"))+ geom_line(mapping = aes(x=degree_p,y=salary, colour=degree_t, size=0.2))+labs(title = "relationship between  work experience by degree and salary paid")
+
+```
+####Surprsingly prior work experience did not alway result in higher salries as seen on our graph, this might due to the high probability of some work experience being irrelevant to the jobs offerimngs and possible impressions the candidate might have had duirng the interview process.
+
+$~$
+
+$~$
+
+### Effects of gender placement
+
+$~$
+
+#### I have decided to use two graphs for this particular analysis so as to analys both differences in placement records by gender and secondly to find out whether those reults are affected by degree choices.
+```{r}
+ggplot(data = data)+ geom_bar(mapping = aes(x=gender, fill=status))+ labs(title = " employment numbers by gender")
+
+
+ggplot(data = data)+ geom_bar(mapping = aes(x=gender, fill=degree_t, size=2))+ labs(title = "relationship between gender and employment status")
+```
+
+$~$
+
+#### We can see that theres a larger number of male students empoyed but also that the female students manage to score better in general, this information then prompted me to do further analysis through the mathmatical analysis I performed below and it is here where the information becomes more clear
+
+### Minimum scores by gender
+```{r echo=FALSE}
+min(data$degree_p[data$status=="Placed" & data$gender=="F"])
+```
+#### Female=56%
+
+```{r echo=FALSE}
+min(data$degree_p[data$status=="Placed" & data$gender=="M"])
+```
+#### Male=56%
+$~$
+
+### max scores by gender
+```{r}
+max(data$degree_p[data$status=="Placed" & data$gender=="F"])
+```
+#### Female=91%
+
+```{r}
+max(data$degree_p[data$status=="Placed" & data$gender=="M"])
+```
+#### Male=83%
+
+$~$
+
+$~$
+
+### Number of students by gender and average placement rate by gender
+```{r echo=FALSE}
+sum(data$gender=="F")
+```
+Number of Female students=76
+
+```{r echo=FALSE}
+sum(data$gender=="M")
+```
+Number of Male students= 139
+
+```{r echo=FALSE}
+sum(data$gender=='F' & data$status=='Placed')/sum(data$gender=='F')
+```
+Number of total placed female students as a percentage of total female students= 63%
+
+```{r echo=FALSE}
+sum(data$gender=='M' & data$status=='Placed')/sum(data$gender=='M')
+```
+Number of total placed male as a percentage of total male students= 72%
+
+```{r echo=FALSE}
+sum(data$gender=='F')-sum(data$gender=='F' & data$status=='Placed')
+```
+Number of female students not placed= 28
+
+```{r echo=FALSE}
+sum(data$gender=='M')-sum(data$gender=='M' & data$status=='Placed')
+
+```
+Number of male students not placed= 39
+
+$~$
+
+* #### There are about 2 times more male students in the class than female students, and this is in turn explains why there are more males being employed
+
+* #### It is also interesting to note that there are more male students than female students who did not get placemnts
+
+* #### While the stats show a lower percentage of female students finding placement, it is worth noting that since there are fewer female students by as much as close         to half, each number represents a geater percentage drop in placement rates compared to male students who will need more studemt to have the same effect.
+
+$~$
+
+$~$
+
+### Effects of exam marks on placement
+```{r}
+ggplot(data = data)+ geom_boxplot(mapping = aes(x=status, y=specialisation, fill=gender)) + labs(title = "relationship between final marks and placement status")
+
+```
+#### A quick look at the above box plot shows us two things 
+
+* Students who managed to get placement had on average, higher marks than those who didnt
+
+* Among both students who got placement and those who didnt, female students had higher marks in both groups
+
+$~$
+
+$~$
+
+# Step 4: Interpret
+
+$~$
+
+## Closing remarks 
+
+* #### From this data set I was able to find a few interesting results including discoveries that final marks and degree choice did affect a students chances of placements
+
+* #### Finance was the most in-demand specialisation by corporate and significantly increased a persons chances of placement
+
+
+$~$
+
+$~$
